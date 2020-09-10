@@ -1,13 +1,9 @@
-#!/usr/bin/env python
-# coding: utf-8
 
 # # 将原始数据转换为句向量
-# 使用tfidf
+# 使用tfidf hour可以为1， 2
+import threading
 
-# In[1]:
-
-
-import pandas as pd                                            
+import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer    
 import numpy as np  
 import random
@@ -16,8 +12,6 @@ from collections import Counter
 from sklearn.metrics import precision_recall_fscore_support
 from sklearn.metrics import accuracy_score
 
-
-# In[2]:
 
 
 hour = 1
@@ -35,16 +29,13 @@ true_labels = data_raw['true class'].values
 # print(features.shape)
 
 
-# # 读取训练数据函数，测试数据函数
-
-# In[3]:
-
+# 读取训练数据函数，测试数据函数
 
 # 把句子的标签转换成数字，因为老师给的很多文件中的标签是英文，转成数字更容易计算
 LABEL_TO_INT = {'Capability':1, 'Usability':2 ,'Security': 3,'Reliability': 4, 'Performance' : 5, 'Lifecycle': 6, 'Software Interface' : 7}
 INT_TO_LABEL = {1:'Capability ', 2:'Usability', 3:'Security', 4:'Reliability', 5:'Performance', 6:'Lifecycle', 7:'Software Interface'}
 
-#返回已经标记的数据数组，未标记的数据数组，已经标记的标签
+# 返回已经标记的数据数组，未标记的数据数组，已经标记的标签
 # 最后返回训练集长度
 def get_train_data(filePath):
     data = pd.read_excel('data/' + filePath + '/train.xlsx')
@@ -72,19 +63,13 @@ def get_test_data(filePath):
 
 
 
-# # 设置每一个小时能标记的量
-
-# In[4]:
-
+# 设置每一个小时能标记的量
 
 INITIAL_ONE_HOUR_LABELED = [38,29,35,31,30]
 INITIAL_TWO_HOUR_LABELED = [82,71,69,68,70]
 
 
-# # 开始试验
-
-# In[5]:
-
+# 开始试验
 
 # 用来存储要放入文件中的数据
 list_number = []
@@ -98,18 +83,11 @@ list_true_class = []
 list_predict = []
 list_c = []
 
-
-# In[6]:
-
-
 # 训练
 def train(train_data_labeled, train_data_labeled_dict, model):
     X = features[train_data_labeled]
     Y = [train_data_labeled_dict[i] for i in train_data_labeled]
     model.fit(X, Y)
-
-
-# In[7]:
 
 
 # 预测未标记标签, 返回可能性最大的编号(index_max)，预测的标签,和他的真实标记
@@ -128,11 +106,6 @@ def predict_unlabeled(train_data_unlabeled, model, train_data_labeled_dict):
 #     print('选取', index_max, '预测标签为',Y[np.argmax(row_max)])
     return index_max,Y[np.argmax(row_max)] ,true_labels[index_max]
     
-    
-
-
-# In[8]:
-
 
 # 增加数据
 def append_data(len_train_data_labeled, accuracy, precision, recall, f1, f_beta, index_max,index_max_pred_class, index_max_true_class, c):
@@ -159,9 +132,6 @@ def append_data(len_train_data_labeled, accuracy, precision, recall, f1, f_beta,
         
 
 
-# In[9]:
-
-
 # 评判指标
 def predict_test(test_data, model):
     X = features[test_data]
@@ -180,9 +150,6 @@ def predict_test(test_data, model):
     accuracy = accuracy_score(Y_true, Y)
     
     return accuracy, precision, recall, f1, f_beta
-
-
-# In[10]:
 
 
 def process(EXPERIMENT):
@@ -317,8 +284,6 @@ def process(EXPERIMENT):
 
     df.to_excel('result/' + 'experiment'+ str(EXPERIMENT)+'_hour'+str(hour)+'.xlsx', sheet_name='E1')
 
-
-# In[ ]:
 
 
 # 开始多线程训练
